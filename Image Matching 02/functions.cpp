@@ -6,12 +6,12 @@ int Match(const vector<KeyPoint> &key_points1, const vector<KeyPoint> &key_point
 	Ptr<DescriptorMatcher> descriptor_matcher =
 		DescriptorMatcher::create("BruteForce");//创建特征匹配器
 
-												//特征匹配
+	//特征匹配
 	vector<DMatch> matches;//匹配结果
 	descriptor_matcher->match(descriptors1, descriptors2, matches);//匹配两个图像的特征矩阵
 
-																   //计算匹配结果中距离的最大和最小值
-																   //距离是指两个特征向量间的欧式距离，表明两个特征的差异，值越小表明两个特征点越接近
+	//计算匹配结果中距离的最大和最小值
+	//距离是指两个特征向量间的欧式距离，表明两个特征的差异，值越小表明两个特征点越接近
 	double max_dist = 0;
 	double min_dist = 100;
 	for (int i = 0; i < matches.size(); i++)
@@ -22,59 +22,59 @@ int Match(const vector<KeyPoint> &key_points1, const vector<KeyPoint> &key_point
 	}
 
 	//通过距离筛选出较好的匹配点    
-	vector<DMatch> goodMatches;		// 存储筛选后较好的匹配点
+	vector<DMatch> good_matches;		// 存储筛选后较好的匹配点
 	double total_distance = 0.0;
 	for (int i = 0; i < matches.size(); i++)
 	{	// 小于最大距离的0.2倍被视为较好的匹配点
 		if (matches[i].distance < 0.2 * max_dist)
 		{
-			goodMatches.push_back(matches[i]);
+			good_matches.push_back(matches[i]);
 		}
 	}
-	//return goodMatches.size();		// 返回较好匹配点的个数
+	//return good_matches.size();		// 返回较好匹配点的个数
 
 	//RANSAC匹配过程  
-	vector<DMatch> m_Matches = goodMatches;
+	vector<DMatch> m_matches = good_matches;
 	// 分配空间  
-	int ptCount = (int)m_Matches.size();
-	Mat p1(ptCount, 2, CV_32F);
-	Mat p2(ptCount, 2, CV_32F);
+	int pt_count = (int)m_matches.size();
+	Mat p1(pt_count, 2, CV_32F);
+	Mat p2(pt_count, 2, CV_32F);
 
 	// 把Keypoint转换为Mat  
 	Point2f pt;
-	for (int i = 0; i<ptCount; i++)
+	for (int i = 0; i < pt_count; i++)
 	{
-		pt = key_points1[m_Matches[i].queryIdx].pt;
+		pt = key_points1[m_matches[i].queryIdx].pt;
 		p1.at<float>(i, 0) = pt.x;
 		p1.at<float>(i, 1) = pt.y;
 
-		pt = key_points2[m_Matches[i].trainIdx].pt;
+		pt = key_points2[m_matches[i].trainIdx].pt;
 		p2.at<float>(i, 0) = pt.x;
 		p2.at<float>(i, 1) = pt.y;
 	}
 
 	// 用RANSAC方法计算F  
-	Mat m_Fundamental;
-	vector<uchar> m_RANSACStatus;       // 这个变量用于存储RANSAC后每个点的状态  
-	findFundamentalMat(p1, p2, m_RANSACStatus, FM_RANSAC);
+	Mat m_fundamental;
+	vector<uchar> m_RANSAC_status;       // 这个变量用于存储RANSAC后每个点的状态  
+	findFundamentalMat(p1, p2, m_RANSAC_status, FM_RANSAC);
 
 	// 计算野点个数  
-	int OutlinerCount = 0;
-	for (int i = 0; i<m_RANSACStatus.size(); i++)
+	int outliner_count = 0;
+	for (int i = 0; i < m_RANSAC_status.size(); i++)
 	{
-		if (m_RANSACStatus[i] == 0)    // 状态为0表示野点  
+		if (m_RANSAC_status[i] == 0)    // 状态为0表示野点  
 		{
-			OutlinerCount++;
+			outliner_count++;
 		}
 	}
 
-	int InlinerCount = ptCount - OutlinerCount;   // 计算内点
+	int inliner_count = pt_count - outliner_count;   // 计算内点
 
-	return InlinerCount;
+	return inliner_count;
 }
 
-void LoadXML(const String & xml_file_name, vector<vector<KeyPoint>>& key_points,
-	vector<Mat>& descriptors)
+void LoadXML(const String &xml_file_name, vector<vector<KeyPoint>> &key_points,
+	vector<Mat> &descriptors)
 {
 	FileStorage fs(xml_file_name, FileStorage::READ);
 	int num_of_pictures;			// 模板图片的总数
