@@ -6,6 +6,9 @@ using namespace cv;
 using namespace std;
 using namespace xfeatures2d;
 
+// 距离筛选时指定小于最大距离多少比例时算较好的匹配点
+const double DISTANCE_RATE_LIMIT = 0.15;
+
 int main()
 {
 	Ptr<SURF> detector = SURF::create(800);				// 创建SURF特征检测器
@@ -19,8 +22,8 @@ int main()
 	}
 
 	// 读入图像    
-	Mat img1 = imread("A1.jpg");
-	Mat img2 = imread("A2.jpg");
+	Mat img1 = imread("M1-1.jpg");
+	Mat img2 = imread("M1-2.jpg");
 
 	// 调整图像大小
 	//resize(img1, img1, img1.size() / 2);
@@ -88,7 +91,7 @@ int main()
 	vector<DMatch> good_matches;
 	for (int i = 0; i<matches.size(); i++)
 	{
-		if (matches[i].distance < 0.2 * max_dist)
+		if (matches[i].distance < DISTANCE_RATE_LIMIT * max_dist)
 		{
 			good_matches.push_back(matches[i]);
 		}
@@ -109,7 +112,8 @@ int main()
 	waitKey(0);
 
 	//RANSAC匹配过程  
-	vector<DMatch> m_matches = good_matches;
+	vector<DMatch> m_matches = good_matches;		// 采用距离筛选后的进行RANSAC
+	//vector<DMatch> m_matches = matches;				// 采用最初的进行RANSAC
 	// 分配空间  
 	int ptCount = (int)m_matches.size();
 	Mat p1(ptCount, 2, CV_32F);
@@ -130,7 +134,7 @@ int main()
 
 	// 用RANSAC方法计算F  
 	Mat m_Fundamental;
-	vector<uchar> m_RANSAC_status;       // 这个变量用于存储RANSAC后每个点的状态  
+	vector<uchar> m_RANSAC_status;       // 这个变量用于存储RANSAC后每个点的状态
 	findFundamentalMat(p1, p2, m_RANSAC_status, FM_RANSAC);
 
 	// 计算野点个数  
@@ -160,7 +164,7 @@ int main()
 
 	for (int i = 0; i<ptCount; i++)
 	{
-		if (m_RANSAC_status[i] != 0)		// 如果不是野点，即是内点
+		if (m_RANSAC_status[i] != 0)	// 如果不是野点，即是内点
 		{
 			m_LeftInlier[inlinerCount].x = p1.at<float>(i, 0);
 			m_LeftInlier[inlinerCount].y = p1.at<float>(i, 1);
