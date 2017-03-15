@@ -8,16 +8,17 @@ using namespace xfeatures2d;
 
 int main()
 {
-	Ptr<SURF> detector = SURF::create(800);//创建SURF特征检测器
-	Ptr<SURF> descriptor_extractor = SURF::create(800);//创建特征向量生成器
-	Ptr<DescriptorMatcher> descriptor_matcher = DescriptorMatcher::create("BruteForce");//创建特征匹配器    
+	Ptr<SURF> detector = SURF::create(800);				// 创建SURF特征检测器
+	Ptr<SURF> descriptor_extractor = SURF::create(800);	// 创建特征向量生成器
+	Ptr<DescriptorMatcher> descriptor_matcher = 
+		DescriptorMatcher::create("BruteForce");		//创建特征匹配器    
 	if (detector.empty() || descriptor_extractor.empty())
 	{
 		cout << "创建特征检测器失败！程序结束。\n";
 		return -1;
 	}
 
-	//读入图像    
+	// 读入图像    
 	Mat img1 = imread("A1.jpg");
 	Mat img2 = imread("A2.jpg");
 
@@ -25,15 +26,15 @@ int main()
 	//resize(img1, img1, img1.size() / 2);
 	//resize(img2, img2, img2.size() / 2);
 
-	//特征点检测    
-	double t = (double)getTickCount();	//当前滴答数    
+	// 特征点检测
+	double t = (double)getTickCount();	// 当前滴答数，用于统计算法用时   
 	vector<KeyPoint> m_LeftKey, m_RightKey;
-	detector->detect(img1, m_LeftKey);	//检测img1中的SUFT特征点，存储到m_LeftKey中
-	detector->detect(img2, m_RightKey);
+	detector->detect(img1, m_LeftKey);	// 检测img1中的SUFT特征点，存储到m_LeftKey中
+	detector->detect(img2, m_RightKey);	// 检测img2中的SUFT特征点，存储到m_RightKey中
 	cout << "图像1特征点个数:" << m_LeftKey.size() << endl;
 	cout << "图像2特征点个数:" << m_RightKey.size() << endl;
 
-	//根据特征点计算特征描述子矩阵，即特征向量矩阵
+	// 根据特征点计算特征描述子矩阵，即特征向量矩阵
 	Mat descriptors1, descriptors2;
 	descriptor_extractor->compute(img1, m_LeftKey, descriptors1);
 	descriptor_extractor->compute(img2, m_RightKey, descriptors2);
@@ -45,16 +46,16 @@ int main()
 	cout << "图像2特征描述矩阵大小：" << descriptors2.size()
 		<< "，特征向量个数：" << descriptors2.rows << "，维数：" << descriptors2.cols << endl;
 
-	//画出特征点    
+	// 画出特征点
 	Mat img_m_LeftKey, img_m_RightKey;
 	drawKeypoints(img1, m_LeftKey, img_m_LeftKey, Scalar::all(-1), 0);
 	drawKeypoints(img2, m_RightKey, img_m_RightKey, Scalar::all(-1), 0);
-	imshow("Src1", img_m_LeftKey);
-	imshow("Src2", img_m_RightKey);
+	imshow("Img1", img_m_LeftKey);
+	imshow("Img2", img_m_RightKey);
 
-	//特征匹配    
-	vector<DMatch> matches;		//存储匹配结果    
-	descriptor_matcher->match(descriptors1, descriptors2, matches);//匹配两个图像的特征矩阵    
+	// 特征匹配
+	vector<DMatch> matches;		// 用于存储匹配结果
+	descriptor_matcher->match(descriptors1, descriptors2, matches);	//匹配两个图像的特征矩阵    
 	cout << "Match个数：" << matches.size() << endl;
 
 	if (matches.size() <= 0)	// 如果没有匹配到特征点
@@ -63,8 +64,15 @@ int main()
 		return -1;
 	}
 
-	//计算匹配结果中距离的最大和最小值    
-	//距离是指两个特征向量间的欧式距离，表明两个特征的差异，值越小表明两个特征点越接近    
+	// 画出最初的特征点匹配情况
+	Mat img_first_matches;
+	drawMatches(img1, m_LeftKey, img2, m_RightKey, matches, img_first_matches,
+		Scalar::all(-1), CV_RGB(0, 255, 0), Mat(), 2);
+	imshow("最初的特征点匹配情况", img_first_matches);
+	waitKey(0);
+
+	// 计算匹配结果中距离的最大和最小值
+	// 距离是指两个特征向量间的欧式距离，表明两个特征的差异，值越小表明两个特征点越接近
 	double max_dist = 0;
 	double min_dist = 100;
 	for (int i = 0; i<matches.size(); i++)
@@ -76,63 +84,60 @@ int main()
 	cout << "最大距离：" << max_dist << endl;
 	cout << "最小距离：" << min_dist << endl;
 
-	//筛选出较好的匹配点    
-	vector<DMatch> goodMatches;
+	// 通过距离筛选出较好的匹配点
+	vector<DMatch> good_matches;
 	for (int i = 0; i<matches.size(); i++)
 	{
 		if (matches[i].distance < 0.2 * max_dist)
 		{
-			goodMatches.push_back(matches[i]);
+			good_matches.push_back(matches[i]);
 		}
 	}
-	cout << "goodMatch个数：" << goodMatches.size() << endl;
+	cout << "经过距离筛选后goodMatch个数：" << good_matches.size() << endl;
 
-	if (goodMatches.size() <= 0)
+	if (good_matches.size() <= 0)
 	{
 		cout << "经过距离筛选后没有好的匹配点，程序退出。\n";
 		return -1;
 	}
 
-	//画出经过距离筛选的匹配结果    
+	// 画出经过距离筛选的匹配结果
 	Mat img_matches;
-	drawMatches(img1, m_LeftKey, img2, m_RightKey, goodMatches, img_matches,
+	drawMatches(img1, m_LeftKey, img2, m_RightKey, good_matches, img_matches,
 		Scalar::all(-1), CV_RGB(0, 255, 0), Mat(), 2);
-	imshow("Match Keypoints Screening by Distance", img_matches);
-	IplImage result = img_matches;
-
+	imshow("经过距离筛选后的匹配情况", img_matches);
 	waitKey(0);
 
-
 	//RANSAC匹配过程  
-	vector<DMatch> m_Matches = goodMatches;
+	vector<DMatch> m_matches = good_matches;
 	// 分配空间  
-	int ptCount = (int)m_Matches.size();
+	int ptCount = (int)m_matches.size();
 	Mat p1(ptCount, 2, CV_32F);
 	Mat p2(ptCount, 2, CV_32F);
 
 	// 把Keypoint转换为Mat  
 	Point2f pt;
-	for (int i = 0; i<ptCount; i++)
+	for (int i = 0; i < ptCount; i++)
 	{
-		pt = m_LeftKey[m_Matches[i].queryIdx].pt;
+		pt = m_LeftKey[m_matches[i].queryIdx].pt;
 		p1.at<float>(i, 0) = pt.x;
 		p1.at<float>(i, 1) = pt.y;
 
-		pt = m_RightKey[m_Matches[i].trainIdx].pt;
+		pt = m_RightKey[m_matches[i].trainIdx].pt;
 		p2.at<float>(i, 0) = pt.x;
 		p2.at<float>(i, 1) = pt.y;
 	}
 
 	// 用RANSAC方法计算F  
 	Mat m_Fundamental;
-	vector<uchar> m_RANSACStatus;       // 这个变量用于存储RANSAC后每个点的状态  
-	findFundamentalMat(p1, p2, m_RANSACStatus, FM_RANSAC);
+	vector<uchar> m_RANSAC_status;       // 这个变量用于存储RANSAC后每个点的状态  
+	findFundamentalMat(p1, p2, m_RANSAC_status, FM_RANSAC);
 
 	// 计算野点个数  
 	int outlinerCount = 0;
 	for (int i = 0; i<ptCount; i++)
 	{
-		if (m_RANSACStatus[i] == 0)    // 状态为0表示野点  
+		if (m_RANSAC_status[i] == 0)    // 状态为0表示野点  
 		{
 			outlinerCount++;
 		}
@@ -140,12 +145,12 @@ int main()
 	int inlinerCount = ptCount - outlinerCount;   // 总匹配点个数减去野点个数就是内点个数  
 	cout << "内点数为：" << inlinerCount << endl;
 
-	// 这三个变量用于保存内点和匹配关系  
+	// 这三个变量用于保存内点和匹配关系
 	vector<Point2f> m_LeftInlier;		// 保存左图的内点们的坐标
 	vector<Point2f> m_RightInlier;		// 保存右图的内点们的坐标
 	vector<DMatch> m_InlierMatches;		// 保存内点们的匹配关系
 
-										// 将三者的大小设置为内点个数大小
+	// 将三者的大小设置为内点个数大小
 	m_InlierMatches.resize(inlinerCount);
 	m_LeftInlier.resize(inlinerCount);
 	m_RightInlier.resize(inlinerCount);
@@ -155,7 +160,7 @@ int main()
 
 	for (int i = 0; i<ptCount; i++)
 	{
-		if (m_RANSACStatus[i] != 0)		// 如果不是野点，即是内点
+		if (m_RANSAC_status[i] != 0)		// 如果不是野点，即是内点
 		{
 			m_LeftInlier[inlinerCount].x = p1.at<float>(i, 0);
 			m_LeftInlier[inlinerCount].y = p1.at<float>(i, 1);
@@ -181,7 +186,7 @@ int main()
 	// 显示计算F过后的内点匹配  
 	Mat outImage;
 	drawMatches(img1, key1, img2, key2, m_InlierMatches, outImage);
-	imshow("Match Keypoints Screening by Distance", outImage);
+	imshow("RANSAC筛选后的匹配情况", outImage);
 	waitKey(0);
 
 	//矩阵H用以存储RANSAC得到的单应矩阵
@@ -205,7 +210,7 @@ int main()
 	line(outImage, scene_corners[1] + offset, scene_corners[2] + offset, Scalar(0, 255, 0), 4);
 	line(outImage, scene_corners[2] + offset, scene_corners[3] + offset, Scalar(0, 255, 0), 4);
 	line(outImage, scene_corners[3] + offset, scene_corners[0] + offset, Scalar(0, 255, 0), 4);
-	imshow("Good Matches & Object detection", outImage);
+	imshow("变换后图像的位置", outImage);
 	waitKey(0);
 
 	int drift = scene_corners[1].x;		//储存偏移量
@@ -252,7 +257,7 @@ int main()
 
 	//进行图像变换，显示效果  
 	warpPerspective(img1, imageturn, H1, Size(width, height));
-	imshow("image_Perspective", imageturn);
+	imshow("左图的变换结果", imageturn);
 	waitKey(0);
 
 	//图像融合  
@@ -328,8 +333,8 @@ int main()
 		}
 	}
 
-	imshow("image_result", img_result);
-	waitKey();
+	imshow("图像融合后的结果", img_result);
+	waitKey(0);
 
 	return 0;
 }
