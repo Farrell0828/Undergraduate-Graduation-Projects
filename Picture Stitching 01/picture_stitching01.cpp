@@ -22,8 +22,8 @@ int main()
 	}
 
 	// 读入图像    
-	Mat img1 = imread("M1-1.jpg");
-	Mat img2 = imread("M1-2.jpg");
+	Mat img1 = imread("M2-1.jpg");
+	Mat img2 = imread("M2-2.jpg");
 
 	// 调整图像大小
 	//resize(img1, img1, img1.size() / 2);
