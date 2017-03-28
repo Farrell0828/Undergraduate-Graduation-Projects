@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Image Matching 02", "Image 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Show 3DS", "Show 3DS\Show 3DS.vcxproj", "{3A810C20-9C23-46BC-82A9-E500FBEE3FEA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Image Matching 03", "Image Matching 03\Image Matching 03.vcxproj", "{D34BEC46-3EEB-4332-BCB1-EA4D627A2514}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -61,6 +63,14 @@ Global
 		{3A810C20-9C23-46BC-82A9-E500FBEE3FEA}.Release|x64.Build.0 = Release|x64
 		{3A810C20-9C23-46BC-82A9-E500FBEE3FEA}.Release|x86.ActiveCfg = Release|Win32
 		{3A810C20-9C23-46BC-82A9-E500FBEE3FEA}.Release|x86.Build.0 = Release|Win32
+		{D34BEC46-3EEB-4332-BCB1-EA4D627A2514}.Debug|x64.ActiveCfg = Debug|x64
+		{D34BEC46-3EEB-4332-BCB1-EA4D627A2514}.Debug|x64.Build.0 = Debug|x64
+		{D34BEC46-3EEB-4332-BCB1-EA4D627A2514}.Debug|x86.ActiveCfg = Debug|Win32
+		{D34BEC46-3EEB-4332-BCB1-EA4D627A2514}.Debug|x86.Build.0 = Debug|Win32
+		{D34BEC46-3EEB-4332-BCB1-EA4D627A2514}.Release|x64.ActiveCfg = Release|x64
+		{D34BEC46-3EEB-4332-BCB1-EA4D627A2514}.Release|x64.Build.0 = Release|x64
+		{D34BEC46-3EEB-4332-BCB1-EA4D627A2514}.Release|x86.ActiveCfg = Release|Win32
+		{D34BEC46-3EEB-4332-BCB1-EA4D627A2514}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
