@@ -14,8 +14,8 @@
 VTK_MODULE_INIT(vtkRenderingOpenGL2);
 VTK_MODULE_INIT(vtkInteractionStyle);
 
-//std::string file_path = "装配散件模型";
-std::string file_path = "汽缸盖";
+std::string file_path = "装配散件模型";
+//std::string file_path = "汽缸盖";
 
 int main()
 {

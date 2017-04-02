@@ -7,7 +7,7 @@ using namespace std;
 using namespace xfeatures2d;
 
 // 距离筛选时指定小于最大距离多少比例时算较好的匹配点
-const double DISTANCE_RATE_LIMIT = 0.15;
+const double DISTANCE_RATE_LIMIT = 0.5;
 
 int main()
 {
@@ -22,8 +22,8 @@ int main()
 	}
 
 	// 读入图像    
-	Mat img1 = imread("M2-1.jpg");
-	Mat img2 = imread("M2-2.jpg");
+	Mat img1 = imread("M3-1.jpg");
+	Mat img2 = imread("M3-2.jpg");
 
 	// 调整图像大小
 	//resize(img1, img1, img1.size() / 2);

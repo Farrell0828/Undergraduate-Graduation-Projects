@@ -19,7 +19,7 @@ int main()
 
 	cv::VideoCapture camera;
 	cv::Mat frame, img;
-	camera.open(1);			// 尝试打开摄像头
+	camera.open(0);			// 尝试打开摄像头
 	if (!camera.isOpened())	// 如果打开失败
 	{
 		cout << "打开摄像头失败!\n";
