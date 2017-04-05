@@ -10,12 +10,12 @@ int Match(const vector<KeyPoint> &key_points1, const vector<KeyPoint> &key_point
 	Ptr<DescriptorMatcher> descriptor_matcher =
 		DescriptorMatcher::create("BruteForce");//创建特征匹配器
 
-												//特征匹配
+	//特征匹配
 	vector<DMatch> matches;//匹配结果
 	descriptor_matcher->match(descriptors1, descriptors2, matches);//匹配两个图像的特征矩阵
 
-																   //计算匹配结果中距离的最大和最小值
-																   //距离是指两个特征向量间的欧式距离，表明两个特征的差异，值越小表明两个特征点越接近
+	//计算匹配结果中距离的最大和最小值
+	//距离是指两个特征向量间的欧式距离，表明两个特征的差异，值越小表明两个特征点越接近
 	double max_dist = 0;
 	double min_dist = 100;
 	for (int i = 0; i < matches.size(); i++)

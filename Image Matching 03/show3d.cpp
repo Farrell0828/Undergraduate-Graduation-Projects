@@ -65,7 +65,7 @@ void ShowOBJ(const string &file_name)
 	renderer->GetActiveCamera()->SetFocalPoint(100, 0, 50);	// 设置相机的焦点(世界坐标系中)
 	renderer->GetActiveCamera()->SetViewUp(0, 0, 1);		// 设置相机的观察试图
 
-															// 获取加载的3DS模型中物体对象的个数
+	// 获取加载的3DS模型中物体对象的个数
 	int numOfActors = importer->GetRenderer()->GetActors()->GetNumberOfItems();
 
 	// 从OBJ图像中依次读取物体
